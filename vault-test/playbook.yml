@@ -1,0 +1,14 @@
+---
+- name: vault test
+  hosts: servers
+  vars_files:
+    - secret.yml
+  tasks:
+    - name: Debug vars
+      debug:
+        var: "{{ user_password }}"
+       
+    - name: Debug vars
+      debug:
+        var: "{{ database_password }}"
+

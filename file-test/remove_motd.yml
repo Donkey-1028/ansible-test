@@ -1,0 +1,8 @@
+---
+- name: remove motd file
+  hosts: all
+  tasks:
+    - name: remove file
+      file:
+        path: /root/motd
+        state: absent

@@ -1,0 +1,21 @@
+---
+- name: configure ssh
+  hosts: servers
+  tasks:
+    - name: configure X11Forwarding
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: ^X11Forwarding
+        line: "X11Forwarding no"
+
+    - name: configure banner path
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: ^#Banner
+        line: Banner /etc/motd
+
+    - name: configure MaxAuthTries
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: ^#MaxAuthTries
+        line: "MaxAuthTries 3"

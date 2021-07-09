@@ -1,0 +1,6 @@
+[coreos]
+100.100.60.60
+
+[coreos:vars]
+ansible_ssh_user=core
+ansible_python_interpreter=/usr/libexec/platform-python

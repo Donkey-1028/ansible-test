@@ -1,0 +1,9 @@
+---
+- name: file content test
+  hosts: all
+  tasks:
+    - name: config motd
+      template:
+        src: motd.j2
+        dest: /root/motd
+      

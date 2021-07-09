@@ -1,0 +1,65 @@
+---
+- name: Create bastion user
+  hosts: bastion
+  vars_files:
+    - vars/user_list.yml
+    - vars/secret.yml
+  tasks:
+    - name: Create user
+      user:
+        name: "{{ item.username }}"
+        uid: "{{ item.uid }}"
+        password: "{{ user_password | password_hash('sha512') }}"
+        group: wheel
+        shell: /bin/bash
+        state: present
+      loop: "{{ users }}"
+      when: "{{ item.uid }} >= 1000 and {{ item.uid }} < 2000"
+
+- name: Create slave user
+  hosts: slave
+  vars_files:
+    - vars/user_list.yml
+    - vars/secret.yml
+  tasks:
+    - name: Create user
+      user:
+        name: "{{ item.username }}"
+        uid: "{{ item.uid }}"
+        password: "{{ user_password | password_hash('sha512') }}"
+        group: wheel
+        shell: /bin/bash
+        state: present
+      loop: "{{ users }}"
+      when: "{{ item.uid }} >= 2000 and {{ item.uid }} < 3000"
+
+- name: Upload ssh key
+  hosts: all
+  vars:
+    ssh_key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCtzGsolyW/2q+OQsQpAGjA732XPLCncxikXvEad2EZujcUGdGQW2CtSaPLwaOr6z8An0Bz5PkZN0HM1/B0Z+DTQnod/NI2gLI/nxyh8O35YtFn8unTEeL9ofdPOZYf7d607phupJCsaiPN0GXG9Y7v+yPwUxCaPbmnNUds43Bf7MYqDSIAINhfV9ybc0WdYVFhFePQ4vHHh3NgOJvLfW4ZtjvmY+1I6NwPWDO9uHpjTllJ7SNCB/xtSQMq0nLSYASrST7vl4DQwzaciF4wvi/Y4wVrvlARkUMc5IqyJvgPf54NAoX9lF23BkFSzgqwiLGw88t8dQys80ZK8yHeDP2gA9PJurHGNUcQkulGrXSTe8kJOqKoN44gB8ovDE0Pq1BB0xMVfHYJyae950nzdbxZEgHWI1D7MwY3hdkyMxInAWLjPHi2NQzycWpC9d1l+OTwiq7x7oMEXyAicYkta0Q6c2sQL3SjjQMJydTRSsEsxY0IFEtZANbrJaCHWvfpmG1SKG3yO1f07MFXqfPnjn+Rp6p+nBDTZPNe2VT0ltyoPIJ9NkT7q/qyOTV4KmV/LagE0Mf3cHOAChGka+PJ9gVtcNmApqLoGXJ8g3Dt90IaFVp5etrB6Ir08pfsNnlQTYA48FHHGADlUFHkkXhXrAZHKojMzRPtejXQqlXkHUqBGw==
+  vars_files:
+    - vars/user_list.yml
+  tasks:
+    - name: register user
+      shell: cat /etc/passwd
+      changed_when: false
+      register: passwd
+
+    - name: create ssh key dir
+      file:
+        path: "/home/{{ item.username }}/.ssh"
+        state: directory
+        owner: "{{ item.username }}"
+        group: wheel
+      when: "'{{ item.username }}' in passwd.stdout"
+      loop: "{{ users }}"
+
+    - name: upload authorized key
+      lineinfile:
+        path: "/home/{{ item.username }}/.ssh/authorized_keys"
+        line: "{{ ssh_key }}"
+        owner: "{{ item.username }}"
+        group: wheel
+        create: yes
+      when: "'{{ item.username }}' in passwd.stdout"
+      loop: "{{ users }}"

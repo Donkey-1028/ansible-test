@@ -1,0 +1,13 @@
+---
+- name: get facts
+  hosts: all
+  gather_facts: yes
+
+- name: hostsvars test
+  hosts: webservers
+  tasks:
+    - name: host vars test
+      template:
+        src: test.j2
+        dest: ./test.txt
+         

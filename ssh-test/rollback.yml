@@ -1,0 +1,21 @@
+---
+- name: rollback ssh
+  hosts: servers
+  tasks:
+    - name: Rollback X11Forwarding
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: ^X11Forwarding
+        line: "X11Forwarding yes"
+
+    - name: Rollback banner path
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: ^Banner
+        line: "#Banner none"
+
+    - name: configure MaxAuthTries
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: ^MaxAuthTries
+        line: "#MaxAuthTries 6"

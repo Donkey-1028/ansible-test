@@ -1,0 +1,23 @@
+---
+- name: user test
+  hosts: test
+  vars_files:
+    - vars/users.yml
+  tasks:
+#    - name: create group
+#      group:
+#        name: "{{ groupname }}"
+#        state: present
+#
+#    - name: create user
+#      user:
+#        name: "{{ username }}"
+#        shell: /bin/bash
+#        groups: "{{ groupname }}"
+#        password: "{{ password | password_hash('sha512','testsalt') }}"
+
+    - name: authorized keys
+      authorized_key:
+        user: core
+        state: present
+        key: "{{ lookup('file', 'public_keys/root.pub') }}"

@@ -1,0 +1,21 @@
+---
+- name: use role test
+  hosts: servers
+  vars:
+    haproxy_frontend_port: 80
+    haproxy_backend_balance_method: 'roundrobin'
+    haproxy_backend_httpchk: ''
+    haproxy_backend_servers:
+      - name: localhost
+        address: 100.100.60.40:8080
+      - name: bastion
+        address: 100.100.60.100:8080
+  roles:
+    - geerlingguy.haproxy
+  tasks:
+    - name: firewalld configure
+      firewalld:
+        port: 80/tcp
+        immediate: yes
+        permanent: yes
+        state: enabled

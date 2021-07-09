@@ -1,0 +1,9 @@
+---
+- name: sofrware package test
+  hosts: all
+  tasks:
+    - name: install packages
+      yum:
+        name: "{{ item }}"
+        state: present
+      loop: "{{ packages }}"

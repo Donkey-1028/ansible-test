@@ -1,0 +1,49 @@
+---
+- name: httpd test
+  hosts: webservers
+  tasks:
+    - name: mkdir group
+      group:
+        name: httpdtest
+        state: present
+
+    - name: install httpd
+      yum:
+        name: httpd
+        state: present
+
+    - name: start and enable httpd
+      service:
+        name: httpd
+        state: started
+        enabled: yes
+
+    - name: config firewalld
+      firewalld:
+        service: http
+        immediate: yes
+        permanent: yes
+        state: enabled
+
+    - name: make link
+      file:
+        src: /var/www/html
+        dest: /httpd
+        mode: u+rwx,g+srwx,o+rwx
+        state: link
+        group: httpdtest
+
+    - name: make index file
+      lineinfile:
+        path: /httpd/index.html
+        line: "httpd test !"
+        group: httpdtest
+        mode: 0666
+        create: yes
+      notify: restart httpd
+
+  handlers:
+    - name: restart httpd
+      service:
+        name: httpd
+        state: restarted

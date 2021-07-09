@@ -1,0 +1,12 @@
+---
+- name: Scheduled Tasks
+  hosts: localhost
+  tasks:
+    - name: schedule
+      cron:
+        name: time
+        job: date >> /var/log/time.log
+        user: root
+        hour: "*"
+        minute: "0"
+        cron_file: ansible_date

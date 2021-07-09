@@ -1,0 +1,7 @@
+---
+- name: Facts test
+  hosts: servers
+  tasks:
+    - name: show pacage facts
+      debug:
+        msg: "{{ ansible_local.custom.sample_exam }}"

@@ -1,0 +1,20 @@
+---
+- name: remove httpd
+  hosts: webservers
+  tasks:
+    - name: disable httpd
+      service:
+        name: httpd
+        state: stopped
+        enabled: no
+    - name: remove httpd
+      yum:
+        name: httpd
+        state: absent
+    - name: remove link
+      file:
+        path: /httpd
+        state: absent
+    - name: stop firewalld
+      service:
+        name: firewalld
